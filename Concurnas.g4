@@ -51,10 +51,10 @@ line
 	:
 	 stmts
 	| nls=NEWLINE+
-	| nop=';' ';' //nop
+	| nop=SEMI_COLON SEMI_COLON //nop
  ;
 
-stmts: csOrss (     (';'|NEWLINE+)  csOrss)*   (';'|NEWLINE+)? ;
+stmts: csOrss (     (SEMI_COLON|NEWLINE+)  csOrss)*   (SEMI_COLON|NEWLINE+)? ;
 
 csOrss: comppound_str_concat|compound_stmt|simple_stmt;//actor MyClass(12) expression reachable version takes priority over compound statement
 
@@ -62,10 +62,10 @@ comppound_str_concat: compound_stmt additiveOp_*;//permits us to do this: a = {}
 
 
 single_line_block
-  :  NEWLINE* '=>' NEWLINE* single_line_element (';' single_line_element)* ';'? //NEWLINE
+  :  NEWLINE* FAT_ARROW NEWLINE* single_line_element (SEMI_COLON single_line_element)* SEMI_COLON? //NEWLINE
   ;
 
-single_line_element: comppound_str_concat|compound_stmt|simple_stmt| (nop=';');
+single_line_element: comppound_str_concat|compound_stmt|simple_stmt| (nop=SEMI_COLON);
 
 ///////////// simple_stmt /////////////
 
@@ -112,18 +112,18 @@ transientAndShared: //can be defined either way around
 ;
 
 assignment:
-	 (annotations NEWLINE? )? ppp? (override=OVERRIDE_N)? transAndShared=transientAndShared? gpuVarQualifier? valvar=(VAL|VAR)? prefix=('-'|'+'|'~')?    (refname = refName typeNoNTTuple) ( assStyle=assignStyle ( rhsAnnotShurtcut = annotation | rhsAssignment = assignmentForcedRHS | rhsExpr = expr_stmt_tuple ) | onchangeEveryShorthand )?
-	| (annotations NEWLINE? )? ppp? (override=OVERRIDE_N)? transAndShared=transientAndShared? gpuVarQualifier?  valvar=(VAL|VAR)? prefix=('-'|'+'|'~')?  refname = refName (refCnt+=':')* ( assStyle=assignStyle (  rhsAnnotShurtcut = annotation | rhsAssignment = assignmentForcedRHS | rhsExpr = expr_stmt_tuple  )   | onchangeEveryShorthand)
-	| LPARA {setNotInArrayDef();} assignmentTupleDereflhsOrNothing (',' assignmentTupleDereflhsOrNothing)+ RPARA {popInArrayDef();} ( assStyle=assignStyle (  rhsAssignment = assignmentForcedRHS | rhsExpr = expr_stmt_tuple  )   | onchangeEveryShorthand)
-	| ppp? (override=OVERRIDE_N)? transAndShared=transientAndShared? gpuVarQualifier? valvar=(VAL|VAR)? prefix=('-'|'+'|'~')?  assignee=expr_stmt ( assStyle=assignStyle  (rhsAnnotShurtcut = annotation | rhsAssignment = assignmentForcedRHS | rhsExpr = expr_stmt_tuple )  | onchangeEveryShorthand)
+	 (annotations NEWLINE? )? ppp? (override=OVERRIDE_N)? transAndShared=transientAndShared? gpuVarQualifier? valvar=(VAL|VAR)? prefix=(MINUS|PLUS|TILDE)?    (refname = refName typeNoNTTuple) ( assStyle=assignStyle ( rhsAnnotShurtcut = annotation | rhsAssignment = assignmentForcedRHS | rhsExpr = expr_stmt_tuple ) | onchangeEveryShorthand )?
+	| (annotations NEWLINE? )? ppp? (override=OVERRIDE_N)? transAndShared=transientAndShared? gpuVarQualifier?  valvar=(VAL|VAR)? prefix=(MINUS|PLUS|TILDE)?  refname = refName (refCnt+=COLON)* ( assStyle=assignStyle (  rhsAnnotShurtcut = annotation | rhsAssignment = assignmentForcedRHS | rhsExpr = expr_stmt_tuple  )   | onchangeEveryShorthand)
+	| LPARA {setNotInArrayDef();} assignmentTupleDereflhsOrNothing (COMMA assignmentTupleDereflhsOrNothing)+ RPARA {popInArrayDef();} ( assStyle=assignStyle (  rhsAssignment = assignmentForcedRHS | rhsExpr = expr_stmt_tuple  )   | onchangeEveryShorthand)
+	| ppp? (override=OVERRIDE_N)? transAndShared=transientAndShared? gpuVarQualifier? valvar=(VAL|VAR)? prefix=(MINUS|PLUS|TILDE)?  assignee=expr_stmt ( assStyle=assignStyle  (rhsAnnotShurtcut = annotation | rhsAssignment = assignmentForcedRHS | rhsExpr = expr_stmt_tuple )  | onchangeEveryShorthand)
 	| lonleyannotation = annotation
 	;
 
 assignmentForcedRHS:
-	 (annotations NEWLINE? )? ppp? (override=OVERRIDE_N)? transAndShared=transientAndShared? gpuVarQualifier? valvar=(VAL|VAR)? prefix=('-'|'+'|'~')?    (refname = refName type) ( assStyle=assignStyle ( rhsAnnotShurtcut = annotation | rhsAssignment = assignmentForcedRHS | rhsExpr = expr_stmt_tuple ) | onchangeEveryShorthand )
-	| (annotations NEWLINE? )? ppp? (override=OVERRIDE_N)? transAndShared=transientAndShared? gpuVarQualifier?  valvar=(VAL|VAR)? prefix=('-'|'+'|'~')?  refname = refName (refCnt+=':')* ( assStyle=assignStyle (  rhsAnnotShurtcut = annotation | rhsAssignment = assignmentForcedRHS | rhsExpr = expr_stmt_tuple  )   | onchangeEveryShorthand)
-	| LPARA {setNotInArrayDef();} assignmentTupleDereflhsOrNothing (',' assignmentTupleDereflhsOrNothing)+ RPARA {popInArrayDef();} ( assStyle=assignStyle (  rhsAssignment = assignmentForcedRHS | rhsExpr = expr_stmt_tuple  )   | onchangeEveryShorthand)
-	| ppp? (override=OVERRIDE_N)? transAndShared=transientAndShared? gpuVarQualifier? valvar=(VAL|VAR)? prefix=('-'|'+'|'~')?  assignee=expr_stmt ( assStyle=assignStyle  (rhsAnnotShurtcut = annotation | rhsAssignment = assignmentForcedRHS | rhsExpr = expr_stmt_tuple )  | onchangeEveryShorthand)
+	 (annotations NEWLINE? )? ppp? (override=OVERRIDE_N)? transAndShared=transientAndShared? gpuVarQualifier? valvar=(VAL|VAR)? prefix=(MINUS|PLUS|TILDE)?    (refname = refName type) ( assStyle=assignStyle ( rhsAnnotShurtcut = annotation | rhsAssignment = assignmentForcedRHS | rhsExpr = expr_stmt_tuple ) | onchangeEveryShorthand )
+	| (annotations NEWLINE? )? ppp? (override=OVERRIDE_N)? transAndShared=transientAndShared? gpuVarQualifier?  valvar=(VAL|VAR)? prefix=(MINUS|PLUS|TILDE)?  refname = refName (refCnt+=COLON)* ( assStyle=assignStyle (  rhsAnnotShurtcut = annotation | rhsAssignment = assignmentForcedRHS | rhsExpr = expr_stmt_tuple  )   | onchangeEveryShorthand)
+	| LPARA {setNotInArrayDef();} assignmentTupleDereflhsOrNothing (COMMA assignmentTupleDereflhsOrNothing)+ RPARA {popInArrayDef();} ( assStyle=assignStyle (  rhsAssignment = assignmentForcedRHS | rhsExpr = expr_stmt_tuple  )   | onchangeEveryShorthand)
+	| ppp? (override=OVERRIDE_N)? transAndShared=transientAndShared? gpuVarQualifier? valvar=(VAL|VAR)? prefix=(MINUS|PLUS|TILDE)?  assignee=expr_stmt ( assStyle=assignStyle  (rhsAnnotShurtcut = annotation | rhsAssignment = assignmentForcedRHS | rhsExpr = expr_stmt_tuple )  | onchangeEveryShorthand)
 	| lonleyannotation = annotation
 	;
 
@@ -132,16 +132,16 @@ assignmentTupleDereflhsOrNothing:
 ;
 
 assignmentTupleDereflhs:
-	(annotations NEWLINE? )? ppp? (override=OVERRIDE_N)? transAndShared=transientAndShared? valvar=(VAL|VAR)? prefix=('-'|'+'|'~')?    (refname = refName type)
-	| (annotations NEWLINE? )? ppp? (override=OVERRIDE_N)? transAndShared=transientAndShared? valvar=(VAL|VAR)? prefix=('-'|'+'|'~')?  refname = refName (refCnt+=':')*
-	| ppp? transAndShared=transientAndShared? valvar=(VAL|VAR)? prefix=('-'|'+'|'~')?  assignee=expr_stmt
+	(annotations NEWLINE? )? ppp? (override=OVERRIDE_N)? transAndShared=transientAndShared? valvar=(VAL|VAR)? prefix=(MINUS|PLUS|TILDE)?    (refname = refName type)
+	| (annotations NEWLINE? )? ppp? (override=OVERRIDE_N)? transAndShared=transientAndShared? valvar=(VAL|VAR)? prefix=(MINUS|PLUS|TILDE)?  refname = refName (refCnt+=COLON)*
+	| ppp? transAndShared=transientAndShared? valvar=(VAL|VAR)? prefix=(MINUS|PLUS|TILDE)?  assignee=expr_stmt
 ;
 
 
-//assignmentNamdAndTypeOnly: (annotations NEWLINE? )? ppp? trans='transient'? gpuVarQualifier? valvar=(VAL|VAR)? prefix=('-'|'+'|'~')?    (refname = refName type);
+//assignmentNamdAndTypeOnly: (annotations NEWLINE? )? ppp? trans='transient'? gpuVarQualifier? valvar=(VAL|VAR)? prefix=(MINUS|PLUS|TILDE)?    (refname = refName type);
 
 onchangeEveryShorthand :
-	('<-' | isEvery='<=') (LPARA {setNotInArrayDef();} onChangeEtcArgs RPARA {popInArrayDef();})? expr_stmt_tuple
+	(BACK_ARROW | isEvery=LESS_THAN_EQUALS) (LPARA {setNotInArrayDef();} onChangeEtcArgs RPARA {popInArrayDef();})? expr_stmt_tuple
 	;
 
 assert_stmt
@@ -149,7 +149,7 @@ assert_stmt
 	;
 
 delete_stmt
-	: DEL_N expr_stmt (',' expr_stmt)* ','?
+	: DEL_N expr_stmt (COMMA expr_stmt)* COMMA?
 	;
 
 flow_stmt
@@ -166,12 +166,12 @@ import_stmt
 	;
 
 import_stmt_impot
-	: (IMPORT_N | using=USING_N) prim=dotted_as_name (',' sec+=dotted_as_name )* ','?
-	| (IMPORT_N | using=USING_N) dotted_name DOT star='*'
+	: (IMPORT_N | using=USING_N) prim=dotted_as_name (COMMA sec+=dotted_as_name )* COMMA?
+	| (IMPORT_N | using=USING_N) dotted_name DOT star=MULTIPLY
 	;
 
 import_stmt_from
-  	: FROM_N dotted_name (IMPORT_N | using=USING_N) (import_as_name (',' import_as_name )* ','? | star='*')
+  	: FROM_N dotted_name (IMPORT_N | using=USING_N) (import_as_name (COMMA import_as_name )* COMMA? | star=MULTIPLY)
 	;
 
 import_as_name
@@ -183,14 +183,14 @@ dotted_as_name
 	;
 
 typedef_stmt
-  : pppNoInject? TYPEDEF_N NAME typedefArgs? '='  type
+  : pppNoInject? TYPEDEF_N NAME typedefArgs? EQUALS  type
   ;
 
-typedefArgs: '<' NAME  (',' NAME )* ','? '>';
+typedefArgs: LESS_THAN NAME  (COMMA NAME )* COMMA? MORE_THAN;
 
 
 await_stmt
- :  AWAIT_N LPARA {setNotInArrayDef();} onChangeEtcArgs  (  ';'  ( expr_stmt | block )?  )? RPARA {popInArrayDef();} //TODO: expand the syntax permitte here
+ :  AWAIT_N LPARA {setNotInArrayDef();} onChangeEtcArgs  (  SEMI_COLON  ( expr_stmt | block )?  )? RPARA {popInArrayDef();} //TODO: expand the syntax permitte here
 ;
 
 ///////////// compound stmt /////////////
@@ -231,22 +231,31 @@ compound_stmt_atomic_base
 blockOrBlock : block | single_line_block;
 
 funcdef
-    : ppp?  ( (override=OVERRIDE_N)? ('def' | gpuitem = GPUDEF_N | gpuitem =GPUKERNEL_N kerneldim = intNode) | (override=OVERRIDE_N) )  ( (extFuncOn ('|' extFuncOn)* )? funcDefName DOT?)?
+    : ppp?  ( (override=OVERRIDE_N)? (DEF_N | gpuitem = GPUDEF_N | gpuitem =GPUKERNEL_N kerneldim = intNode) | (override=OVERRIDE_N) )  ( (extFuncOn (PIPE extFuncOn)* )? funcDefName DOT?)?
     		genericQualiList?
     		LPARA {setNotInArrayDef();} funcParams? RPARA {popInArrayDef();} retTypeIncVoid? blockOrBlock?
 	;
 
 funcDefName
 	: NAME //now for operator overloading...
-	| '='
-	| '+' | '-'
-	| '*'| '/'
-	| '**'| '++' | '--'
+	| EQUALS
+	| PLUS
+	| MINUS
+	| MULTIPLY
+	| DIVIDE
+	| DUEL_MULTIPLY
+	| DUEL_PLUS
+	| DUEL_MINUS
 	| MOD_N | OR_N | AND_N | NOT_N
-	| '<''<' | '>' '>' | '>' '>' '>'
+	| DUEL_LESS_THAN | DUEL_MORE_THAN | TRIPLE_MORE_THAN
 	| COMP_N | BAND_N | BOR_N | BXOR_N
-	| '-=' | '*=' | '/=' | MOD_N '=' | '**=' | '+=' | OR_N '=' | AND_N '=' | '<<='
-	| '>>=' | '>>>=' | BAND_N '=' | BOR_N '=' | BXOR_N '='
+	| MINUS_EQUALS
+	| MULTIPLY_EQUALS
+	| DIVIDE_EQUALS
+	| MOD_N EQUALS
+	| DUEL_MULTIPLY EQUALS
+	| PLUS_EQUALS | OR_N_EQUALS | AND_N_EQUALS | DUEL_LESS_THAN_EQUALS
+	| DUEL_MORE_THAN_EQUALS | TRIPLE_MORE_THAN_EQUALS | BAND_N_EQUALS | BOR_N_EQUALS | BXOR_N_EQUALS
 	;
 
 
@@ -256,15 +265,15 @@ extFuncOn
 	;
 
 funcParams
-  : funcParam (',' funcParam)* (',')?
+  : funcParam (COMMA funcParam)* (COMMA)?
   ;
 
 funcParam:
 	annotations? sharedOrLazy? (gpuVarQualifier gpuInOutFuncParamModifier?)? (isFinal=VAL|VAR)?
 	(
-		NAME ( type isvararg='...'?)? ('=' expr_stmt )
+		NAME ( type isvararg=TRIPLE_DOT?)? (EQUALS expr_stmt )
 		|
-		NAME? ( type isvararg='...'?) ('=' expr_stmt )?
+		NAME? ( type isvararg=TRIPLE_DOT?) (EQUALS expr_stmt )?
 	)
 	;
 
@@ -285,12 +294,12 @@ constructorDef
 
 
 objectProviderArgs
-	: objectProviderArg (',' objectProviderArg )* (',')?
+	: objectProviderArg (COMMA objectProviderArg )* (COMMA)?
 	;
 
 objectProviderArg:
 	annotations? pppNoInject? transAndShared=transientAndShared?
-		(isFinal=VAL|VAR)? NAME  ((type | (refCnt+=':')+) isvararg='...'? )? ( '='  expr_stmt )?
+		(isFinal=VAL|VAR)? NAME  ((type | (refCnt+=COLON)+) isvararg=TRIPLE_DOT? )? ( EQUALS  expr_stmt )?
 	;
 
 
@@ -306,13 +315,13 @@ objectProviderBlock:
 	;
 
 objectProviderLine:
-	(pppNoInject? (single=SINGLE_N | shared=SHARED_N)? PROVIDE_N genericQualiList? lazy=LAZY_N? fieldName=stringNode? provName=NAME? provide=type ('=>' provideExpr=expr_stmt  | objectProviderNestedDeps )?
-	| opdl=objectProviderLineDep) (';'|NEWLINE+)
+	(pppNoInject? (single=SINGLE_N | shared=SHARED_N)? PROVIDE_N genericQualiList? lazy=LAZY_N? fieldName=stringNode? provName=NAME? provide=type (FAT_ARROW provideExpr=expr_stmt  | objectProviderNestedDeps )?
+	| opdl=objectProviderLineDep) (SEMI_COLON|NEWLINE+)
 	;
 
-objectProviderNestedDeps : LBRACE ((';'|NEWLINE+)? nestedDep+=objectProviderLineDep ((';'|NEWLINE+) nestedDep+=objectProviderLineDep)* )? (';'|NEWLINE+)? RBRACE;
+objectProviderNestedDeps : LBRACE ((SEMI_COLON|NEWLINE+)? nestedDep+=objectProviderLineDep ((SEMI_COLON|NEWLINE+) nestedDep+=objectProviderLineDep)* )? (SEMI_COLON|NEWLINE+)? RBRACE;
 
-objectProviderLineDep: (single=SINGLE_N | shared=SHARED_N)? lazy=LAZY_N? fieldName=stringNode? nameFrom=type ('=>' exprTo=expr_stmt | '<=' typeOnlyRHS=type objectProviderNestedDeps?)?;
+objectProviderLineDep: (single=SINGLE_N | shared=SHARED_N)? lazy=LAZY_N? fieldName=stringNode? nameFrom=type (FAT_ARROW exprTo=expr_stmt | LESS_THAN_EQUALS typeOnlyRHS=type objectProviderNestedDeps?)?;
 
 
 classdef
@@ -323,18 +332,18 @@ classdef
 			istypedActor=OF_N ( typedActorOn=namedType_ExActor typeActeeExprList=expr_stmtList?  )
 		)?
 		(
-			NEWLINE* (EXTENDS_N | '<') superCls=dotted_name ('<' superGenType+=type (',' superGenType+=type )* ','? '>')?
+			NEWLINE* (EXTENDS_N | LESS_THAN) superCls=dotted_name (LESS_THAN superGenType+=type (COMMA superGenType+=type )* COMMA? MORE_THAN)?
 		 	 extExpressions=expr_stmtList?
 		)?
 		(
-			NEWLINE* (WITH_N | '~') implInstance ((',' implInstance)*) ','?
+			NEWLINE* (WITH_N | TILDE) implInstance ((COMMA implInstance)*) COMMA?
 		)?
 		(block | NEWLINE+ | EOF)
 	;
 
 
 implInstance:
-	impli=dotted_name ('<' implType+=type (',' implType+=type )* ','? '>')?
+	impli=dotted_name (LESS_THAN implType+=type (COMMA implType+=type )* COMMA? MORE_THAN)?
 	;
 
 localclassdef
@@ -345,11 +354,11 @@ localclassdef
 			istypedActor=OF_N ( typedActorOn=namedType_ExActor typeActeeExprList=expr_stmtList?  )
 		)?
 		(
-			(EXTENDS_N | '<') superCls=dotted_name ('<' type (',' type )* ','? '>')?
+			(EXTENDS_N | LESS_THAN) superCls=dotted_name (LESS_THAN type (COMMA type )* COMMA? MORE_THAN)?
 		 	 extExpressions=expr_stmtList?
 		)?
 		(
-			(WITH_N | '~') implInstance ((',' implInstance)* | ','?)
+			(WITH_N | TILDE) implInstance ((COMMA implInstance)* | COMMA?)
 		)?
 		block
 	;
@@ -357,36 +366,36 @@ localclassdef
 anonclassdef
 	: (NEW_N isactor=ACTOR_N?  )
 		(
-			superCls=dotted_name ('<' type (',' type )* ','? '>')?
+			superCls=dotted_name (LESS_THAN type (COMMA type )* COMMA? MORE_THAN)?
 		)
 
 		(
-			(WITH_N | '~') implInstance ((',' implInstance)* | ','?)
+			(WITH_N | TILDE) implInstance ((COMMA implInstance)* | COMMA?)
 		)?
 		block?
 	;
 
 
-expr_stmtList : (LPARA {setNotInArrayDef();} (expr_stmt ( ',' expr_stmt )*)? RPARA {popInArrayDef();});
+expr_stmtList : (LPARA {setNotInArrayDef();} (expr_stmt ( COMMA expr_stmt )*)? RPARA {popInArrayDef();});
 
 
 classdefArgs
-	: classdefArg (',' classdefArg )* (',')?
+	: classdefArg (COMMA classdefArg )* (COMMA)?
 	;
 
 classdefArg:
-	annotations? pppNoInject? (override=OVERRIDE_N)? transAndShared=transientAndShared? (isFinal=VAL|VAR)? (prefix=('-'|'+'|'~'))? NAME  ((type | (refCnt+=':')+) isvararg='...'? )? ( '='  expr_stmt )?
+	annotations? pppNoInject? (override=OVERRIDE_N)? transAndShared=transientAndShared? (isFinal=VAL|VAR)? (prefix=(MINUS|PLUS|TILDE))? NAME  ((type | (refCnt+=COLON)+) isvararg=TRIPLE_DOT? )? ( EQUALS  expr_stmt )?
 	;
 
 
 annotationDef
   : pppNoInject? ANNOTATION_N NAME
-      ( LPARA {setNotInArrayDef();} annotationArg  (',' annotationArg )* ','? RPARA {popInArrayDef();} )?
+      ( LPARA {setNotInArrayDef();} annotationArg  (COMMA annotationArg )* COMMA? RPARA {popInArrayDef();} )?
       block?
   ;
 
 annotationArg:
-	annotations? NAME type? ('=' expr_stmt)?
+	annotations? NAME type? (EQUALS expr_stmt)?
 	;
 
 
@@ -399,7 +408,7 @@ enumItem
   ;
 
 enumblock
-	: LBRACE NEWLINE* enumItem ( NEWLINE* ',' NEWLINE* enumItem )* (';'|NEWLINE*) line* NEWLINE* RBRACE
+	: LBRACE NEWLINE* enumItem ( NEWLINE* COMMA NEWLINE* enumItem )* (SEMI_COLON|NEWLINE*) line* NEWLINE* RBRACE
 	;
 
 ///////////// compound stmt:compound_stmt_atomic_base /////////////
@@ -410,8 +419,8 @@ fors
   ;
 
 for_stmt
-	: forblockvariant LPARA {setNotInArrayDef();} ( (localVarName=NAME localVarType=type?) | ( LPARA {setNotInArrayDef();} forVarTupleOrNothing (',' forVarTupleOrNothing)+ RPARA {popInArrayDef();}))  'in' expr=expr_stmt_tuple
-	    (';'  (idxName=NAME idxType=type? (('\\=' | '=') idxExpr=expr_stmt)?) )? RPARA {popInArrayDef();} mainblock=block
+	: forblockvariant LPARA {setNotInArrayDef();} ( (localVarName=NAME localVarType=type?) | ( LPARA {setNotInArrayDef();} forVarTupleOrNothing (COMMA forVarTupleOrNothing)+ RPARA {popInArrayDef();})) IN_N expr=expr_stmt_tuple
+	    (SEMI_COLON  (idxName=NAME idxType=type? ((ESCAPE_EQUALS | EQUALS) idxExpr=expr_stmt)?) )? RPARA {popInArrayDef();} mainblock=block
 	    (NEWLINE* ELSE_N elseblock=block )?
 	;
 
@@ -421,8 +430,8 @@ forVarTuple: localVarName=NAME localVarType=type?;
 
 for_stmt_old
   : forblockvariant LPARA {setNotInArrayDef();} ( (NAME type? assignStyle assigFrom=expr_stmt_tuple) | assignExpr=expr_stmt_tuple )?
-					  	';' check=expr_stmt?
-					  	';' postExpr=expr_stmt?
+					  	SEMI_COLON check=expr_stmt?
+					  	SEMI_COLON postExpr=expr_stmt?
 				  	RPARA {popInArrayDef();}
   	  	mainblock=block
     ( NEWLINE* ELSE_N elseblock=block  )?
@@ -474,20 +483,20 @@ match_case_stmt_nocase:
 
 match_also_attachment: ALSO_N expr_stmt;
 
-match_case_stmt_typedCase: (type ( OR_N type  )* ( ';' (case_expr_chain_Tuple | case_expr_chain_or) )? ); //TypedCaseExpression
+match_case_stmt_typedCase: (type ( OR_N type  )* ( SEMI_COLON (case_expr_chain_Tuple | case_expr_chain_or) )? ); //TypedCaseExpression
 
-match_case_stmt_assign: ( ( var=VAR | isfinal=VAL)? NAME (type ('or' type)*)? ( ';'  expr_stmt)? );//CaseExpressionAssign
+match_case_stmt_assign: ( ( var=VAR | isfinal=VAL)? NAME (type (OR_N type)*)? ( SEMI_COLON  expr_stmt)? );//CaseExpressionAssign
 
 match_case_assign_typedObjectAssign: (var=VAR | isfinal=VAL)? NAME bitwise_or;
 
-match_case_stmt_assignTuple:  ( LPARA {setNotInArrayDef();} matchTupleAsignOrNone (',' matchTupleAsignOrNone)+ RPARA {popInArrayDef();}) ( ';'  expr_stmt)? ;//CaseExpressionAssign
+match_case_stmt_assignTuple:  ( LPARA {setNotInArrayDef();} matchTupleAsignOrNone (COMMA matchTupleAsignOrNone)+ RPARA {popInArrayDef();}) ( SEMI_COLON  expr_stmt)? ;//CaseExpressionAssign
 
 matchTupleAsignOrNone: matchTupleAsign?;
 
 matchTupleAsign: NAME type;
 
 case_expr_chain_Tuple:
-	LPARA {setNotInArrayDef();} case_expr_chain_orOrNone (',' case_expr_chain_orOrNone )+  RPARA {popInArrayDef();}
+	LPARA {setNotInArrayDef();} case_expr_chain_orOrNone (COMMA case_expr_chain_orOrNone )+  RPARA {popInArrayDef();}
 ;
 
 case_expr_chain_orOrNone: case_expr_chain_or?;
@@ -508,7 +517,15 @@ case_expr
   ;
 
 
-case_operator : '==' | '<' | '<>' | '&==' | '&<>' | '>' | '>==' | '<==' ;
+case_operator : EQUALS
+              | LESS_THAN
+              | LESS_THAN_MORE_THAN
+              | AND_DUEL_EQUALS
+              | AND_LESS_THAN_MORE_THAN
+              | MORE_THAN
+              | MORE_THAN_DUEL_EQUALS
+              | LESS_THAN_DUEL_EQUALS
+              ;
 
 case_operator_pre
   :  case_operator | IN_N | NOT_N IN_N
@@ -537,18 +554,18 @@ async_block
 
 while_stmt
 	: WHILE_N LPARA {setNotInArrayDef();}  mainExpr=expr_stmt
-						(';'  (idxName=NAME idxType=type? (('\\=' | '=') idxExpr=expr_stmt)?) )?// | nameAlone=NAME
+						(SEMI_COLON  (idxName=NAME idxType=type? ((ESCAPE_EQUALS | EQUALS) idxExpr=expr_stmt)?) )?// | nameAlone=NAME
 	RPARA {popInArrayDef();} mainBlock=block
 	  ( NEWLINE* ELSE_N elseblock=block )?
 	;
 
 loop_stmt
   : LOOP_N
-  (LPARA {setNotInArrayDef();}  (idxName=NAME idxType=type? (('\\=' | '=') idxExpr=expr_stmt)?)  RPARA {popInArrayDef();} )? mainBlock=block
+  (LPARA {setNotInArrayDef();}  (idxName=NAME idxType=type? ((ESCAPE_EQUALS | EQUALS) idxExpr=expr_stmt)?)  RPARA {popInArrayDef();} )? mainBlock=block
   ;
 
 try_stmt
-	:	TRY_N  (LPARA {setNotInArrayDef();}  simple_stmt  (';'? simple_stmt  )* ';'?  RPARA {popInArrayDef();})? mainblock=block
+	:	TRY_N  (LPARA {setNotInArrayDef();}  simple_stmt  (SEMI_COLON? simple_stmt  )* SEMI_COLON?  RPARA {popInArrayDef();})? mainblock=block
 	  catchBlock*
 	  ( NEWLINE* FINALLY_N  finblock=block )?
 	;
@@ -556,7 +573,7 @@ try_stmt
 catchBlock: NEWLINE* CATCH_N  LPARA {setNotInArrayDef();}   NAME  (type   (OR_N  type   )* )? RPARA {popInArrayDef();}  block ;
 
 block_async
-  : block_ ( async='!'( LPARA {setNotInArrayDef();} executor=expr_stmt RPARA {popInArrayDef();} )? )?
+  : block_ ( async=EXCLAMATION( LPARA {setNotInArrayDef();} executor=expr_stmt RPARA {popInArrayDef();} )? )?
   ;
 
 
@@ -579,51 +596,51 @@ sync_block
   ;
 
 onchange
- :  ONCHANGE_N (LPARA {setNotInArrayDef();} onChangeEtcArgs (';' opts+=NAME (',' opts+=NAME )* (',')? )? RPARA {popInArrayDef();})? (block )//| single_line_block
+ :  ONCHANGE_N (LPARA {setNotInArrayDef();} onChangeEtcArgs (SEMI_COLON opts+=NAME (COMMA opts+=NAME )* (COMMA)? )? RPARA {popInArrayDef();})? (block )//| single_line_block
  ;
 
 
 every
- :  EVERY_N (LPARA {setNotInArrayDef();} onChangeEtcArgs (';' opts+=NAME (',' opts+=NAME )* (',')? )? RPARA {popInArrayDef();})? (block )//| single_line_block
+ :  EVERY_N (LPARA {setNotInArrayDef();} onChangeEtcArgs (SEMI_COLON opts+=NAME (COMMA opts+=NAME )* (COMMA)? )? RPARA {popInArrayDef();})? (block )//| single_line_block
 ;
 
 ///////////// annotations /////////////
 
 annotations
-  : annotation (NEWLINE* ','? NEWLINE* annotation)*
+  : annotation (NEWLINE* COMMA? NEWLINE* annotation)*
   ;
 
 annotation
-  :'@' (LBRACK loc+=(THIS_N | NAME) (',' loc+=(THIS_N | NAME) )* (',')? RBRACK)?
+  :AMP (LBRACK loc+=(THIS_N | NAME) (COMMA loc+=(THIS_N | NAME) )* (COMMA)? RBRACK)?
      dotted_name
     ( LPARA {setNotInArrayDef();} (namedAnnotationArgList |  expr_stmt  )?  RPARA {popInArrayDef();} )?
   ;
 
 namedAnnotationArgList
-  : n2expr (',' n2expr )*  ','?
+  : n2expr (COMMA n2expr )*  COMMA?
   ;
 
-n2expr : NAME '=' expr_stmt;
+n2expr : NAME EQUALS expr_stmt;
 
 
 ///////////// common /////////////
 
-genericQualiList: '<' nameAndUpperBound  (',' nameAndUpperBound )* ','? '>';
+genericQualiList: LESS_THAN nameAndUpperBound  (COMMA nameAndUpperBound )* COMMA? MORE_THAN;
 
-nameAndUpperBound: NAME namedType? nullable='?'?;
+nameAndUpperBound: NAME namedType? nullable=QUESTION?;
 
 dottedNameList
-	: dotted_name (',' dotted_name  )* ','?
+	: dotted_name (COMMA dotted_name  )* COMMA?
 	;
 
 inoutGenericModifier : IN_N | OUT_N;
 
 onChangeEtcArgs
- : onChangeEtcArg (',' onChangeEtcArg)*
+ : onChangeEtcArg (COMMA onChangeEtcArg)*
  ;
 
 onChangeEtcArg
-	: valvar=(VAL|VAR)? NAME (type | (refCnt+=':')+)? '=' expr_stmt
+	: valvar=(VAL|VAR)? NAME (type | (refCnt+=COLON)+)? EQUALS expr_stmt
 	| expr_stmt
 	;
 
@@ -631,7 +648,22 @@ dotted_name
 	: NAME ( DOT  NAME )*
 	;
 
-assignStyle : '\\=' | '=' | '+=' | '-=' | '*=' | '/=' | MOD_N '=' | '**=' | OR_N '=' | AND_N '=' | '<<=' | '>>=' | '>>>=' | BAND_N '=' | BOR_N '='| BXOR_N '=';
+assignStyle : ESCAPE EQUALS
+            | EQUALS
+            | PLUS_EQUALS
+            | MINUS_EQUALS
+            | MULTIPLY_EQUALS
+            | DIVIDE_EQUALS
+            | MOD_N_EQUALS
+            | DUEL_MULTIPLY_EQUALS
+            | OR_N_EQUALS
+            | AND_N_EQUALS
+            | DUEL_LESS_THAN_EQUALS
+            | DUEL_MORE_THAN_EQUALS
+            | TRIPLE_MORE_THAN_EQUALS
+            | BAND_N EQUALS
+            | BOR_N EQUALS
+            | BXOR_N EQUALS;
 
 block
   : NEWLINE* block_
@@ -642,29 +674,29 @@ block_
   ;
 
 pureFuncInvokeArgs
-	: LPARA {setNotInArrayDef();} (pureFuncInvokeArg (',' pureFuncInvokeArg)* ','? )?  RPARA {popInArrayDef();}
+	: LPARA {setNotInArrayDef();} (pureFuncInvokeArg (COMMA pureFuncInvokeArg)* COMMA? )?  RPARA {popInArrayDef();}
 	;
 
 pureFuncInvokeArg
-	: (NAME  '=' )? ( expr_stmt  |  primitiveType |  funcType | tupleType)
+	: (NAME  EQUALS )? ( expr_stmt  |  primitiveType |  funcType | tupleType)
 	;
 
 
 funcRefArgs
-  : LPARA {setNotInArrayDef();} (  funcRefArg (  ',' funcRefArg )* ','? )? RPARA {popInArrayDef();}
+  : LPARA {setNotInArrayDef();} (  funcRefArg (  COMMA funcRefArg )* COMMA? )? RPARA {popInArrayDef();}
   ;
 
 funcRefArg
-	: (NAME '=')? ( '?' lazy=LAZY_N? type | lazy=LAZY_N? primitiveType | lazy=LAZY_N? funcType nullable='?'? | lazy=LAZY_N? LPARA {setNotInArrayDef();} tupleType RPARA {popInArrayDef();} nullable='?'? | lazy=LAZY_N? namedType nullable='?' | expr_stmt | (refcnt+=':')+ )
+	: (NAME EQUALS)? ( QUESTION lazy=LAZY_N? type | lazy=LAZY_N? primitiveType | lazy=LAZY_N? funcType nullable=QUESTION? | lazy=LAZY_N? LPARA {setNotInArrayDef();} tupleType RPARA {popInArrayDef();} nullable=QUESTION? | lazy=LAZY_N? namedType nullable=QUESTION | expr_stmt | (refcnt+=COLON)+ )
 	;
 
 genTypeList
   :
-	'<' genTypeListElemnt ( ',' genTypeListElemnt )* ','? '>'
+	LESS_THAN genTypeListElemnt ( COMMA genTypeListElemnt )* COMMA? MORE_THAN
   ;
 
 genTypeListElemnt
-	: '?'   | ( inoutGenericModifier?  type )
+	: QUESTION   | ( inoutGenericModifier?  type )
 	;
 
 
@@ -675,14 +707,14 @@ trefOrArrayRef:
 	| refOrNullable
 	;
 
-refOrNullable: ':' dotted_name?
-	| nullable='?'
-	| nullableErr='??'
+refOrNullable: COLON dotted_name?
+	| nullable=QUESTION
+	| nullableErr=DUEL_QUESTION
 	;
 
 
 type:
-	 bareTypeParamTuple ('|' bareTypeParamTuple)* trefOrArrayRef*
+	 bareTypeParamTuple (PIPE bareTypeParamTuple)* trefOrArrayRef*
 	 ;
 
 
@@ -695,7 +727,7 @@ bareTypeParamTuple:
 
 
 typeNoNTTuple:
-	 bareTypeParamTupleNoNT ('|' bareTypeParamTupleNoNT)* trefOrArrayRef*
+	 bareTypeParamTupleNoNT (PIPE bareTypeParamTupleNoNT)* trefOrArrayRef*
 	 ;
 
 bareTypeParamTupleNoNT:
@@ -705,7 +737,7 @@ bareTypeParamTupleNoNT:
 	| LPARA {setNotInArrayDef();} tupleTypeNoNT RPARA {popInArrayDef();}
 	;
 
-tupleTypeNoNT : bareButTupleNoNT (',' bareButTupleNoNT )+ ;
+tupleTypeNoNT : bareButTupleNoNT (COMMA bareButTupleNoNT )+ ;
 
 bareButTupleNoNT: primitiveType | funcType;
 
@@ -715,7 +747,7 @@ ppp: inject=INJECT?  pp=(PRIVATE | PROTECTED | PUBLIC | PACKAGE)
 
 pppNoInject: PRIVATE | PROTECTED | PUBLIC | PACKAGE;
 
-pointerQualifier : (cnt+='*'|cnt2+='**')+;
+pointerQualifier : (cnt+=MULTIPLY|cnt2+=DUEL_MULTIPLY)+;
 
 //typeNoPrim : namedType | funcType | tupleType;
 
@@ -731,7 +763,7 @@ namedType_ExActor
 
 nameAndgens : NAME genTypeList?;
 
-tupleType : bareButTuple (',' bareButTuple )+ ;
+tupleType : bareButTuple (COMMA bareButTuple )+ ;
 
 bareButTuple: (primitiveType | namedType | funcType ) trefOrArrayRef*;
 
@@ -742,7 +774,7 @@ funcType :
 
 funcType_
 	: genericQualiList?
-	    LPARA {setNotInArrayDef();} ( (type (',' type)*)? ','?  | constr='*' ) RPARA {popInArrayDef();} retTypeIncVoid
+	    LPARA {setNotInArrayDef();} ( (type (COMMA type)*)? COMMA?  | constr=MULTIPLY ) RPARA {popInArrayDef();} retTypeIncVoid
 	;
 
 retTypeIncVoid
@@ -754,7 +786,7 @@ primitiveType: (BOOLEAN_N | BOOL_N) | SIZE_T_N | INT_N | LONG_N | FLOAT_N | DOUB
 
 ///////////// expresssions /////////////
 
-expr_stmt_tuple : expr_stmt ( (',' expr_stmt)+ ','? )?;
+expr_stmt_tuple : expr_stmt ( (COMMA expr_stmt)+ COMMA? )?;
 
 expr_stmt
 	: for_list_comprehension
@@ -765,7 +797,7 @@ for_list_comprehension
 	;
 
 flc_forStmt_:
-	forblockvariant (localVarName=NAME localVarType=type?  | ( LPARA {setNotInArrayDef();} forVarTupleOrNothing (',' forVarTupleOrNothing)+ RPARA {popInArrayDef();}))   IN_N expr=expr_list
+	forblockvariant (localVarName=NAME localVarType=type?  | ( LPARA {setNotInArrayDef();} forVarTupleOrNothing (COMMA forVarTupleOrNothing)+ RPARA {popInArrayDef();}))   IN_N expr=expr_list
 	;
 
 
@@ -780,7 +812,7 @@ lambdadef
     : annotations? DEF_N genericQualiList?  LPARA {setNotInArrayDef();}  funcParams? RPARA {popInArrayDef();} retTypeIncVoid? (block | (single_line_block NEWLINE+))  ;
 
 
-anonLambdadef : ((NAME (',' NAME)*) | LPARA {setNotInArrayDef();} ( typeAnonParam (',' typeAnonParam)*) RPARA {popInArrayDef();}) retType=type? single_line_block;
+anonLambdadef : ((NAME (COMMA NAME)*) | LPARA {setNotInArrayDef();} ( typeAnonParam (COMMA typeAnonParam)*) RPARA {popInArrayDef();}) retType=type? single_line_block;
 
 typeAnonParam: NAME type?;
 
@@ -811,32 +843,32 @@ relOpAndExpression_: relationalOperator  shiftExpr;
 
 
 shiftExpr: additiveExpr ( shiftExprOp_)*;
-shiftExprOp_: (lshift='<' '<' | rshift='>' '>' | rshiftu='>' '>' '>')  additiveExpr;
+shiftExprOp_: (lshift=LESS_THAN LESS_THAN | rshift=MORE_THAN MORE_THAN | rshiftu=MORE_THAN MORE_THAN MORE_THAN)  additiveExpr;
 
 
 additiveExpr: divisiveExpr ( additiveOp_)*;
-additiveOp_ : ({notArrayDef()}? op='-' divisiveExpr ) | op='+'  divisiveExpr;
+additiveOp_ : ({notArrayDef()}? op=MINUS divisiveExpr ) | op=PLUS  divisiveExpr;
 
 divisiveExpr: powExpr ( divisiveExprOP_)*;
-divisiveExprOP_:op=('*'|'/'| MOD_N)  powExpr;
+divisiveExprOP_:op=(MULTIPLY|DIVIDE| MOD_N)  powExpr;
 
-powExpr :  lhs=notExpr ( '**'  rhs+=notExpr)*;
+powExpr :  lhs=notExpr ( DUEL_MULTIPLY  rhs+=notExpr)*;
 
 notExpr: isnot=NOT_N? containsExpr;
 
 containsExpr : lhs=prefixExpr ( (invert=NOT_N? IN_N)  rhs=prefixExpr)?;
 
-prefixExpr : prefixOp=('++' | '--' | '-' | '+' | COMP_N)?	 postfixExpr;
+prefixExpr : prefixOp=(DUEL_PLUS | DUEL_MINUS | MINUS | PLUS | COMP_N)?	 postfixExpr;
 
-postfixExpr : sizeOfExpr postfixOp=('++' | '--')?;
+postfixExpr : sizeOfExpr postfixOp=(DUEL_PLUS | DUEL_MINUS)?;
 
-sizeOfExpr: (sizeof=SIZEOF_N  ('<' variant=dotted_name '>')? )? asyncSpawnExpr;
+sizeOfExpr: (sizeof=SIZEOF_N  (LESS_THAN variant=dotted_name MORE_THAN)? )? asyncSpawnExpr;
 
-asyncSpawnExpr: notNullAssertion (isAsync='!' (LPARA {setNotInArrayDef();} expr_stmt RPARA {popInArrayDef();})? )?;
+asyncSpawnExpr: notNullAssertion (isAsync=EXCLAMATION (LPARA {setNotInArrayDef();} expr_stmt RPARA {popInArrayDef();})? )?;
 
 
-notNullAssertion :  elvisOperator ( nna='??')?;
-elvisOperator :  lhsExpr=vectorize ( '?:'  elsExpr=if_expr)?  ;
+notNullAssertion :  elvisOperator ( nna=DUEL_QUESTION)?;
+elvisOperator :  lhsExpr=vectorize ( QUESTION_COLON  elsExpr=if_expr)?  ;
 
 
 vectorize: primary=vectorize vectorize_element+
@@ -844,17 +876,17 @@ vectorize: primary=vectorize vectorize_element+
 	;
 
 vectorize_element:
-	nullsafe='?'? ('^' (doubledot='^')? ) (constru=constructorInvoke | arrayRefElements+ | afterVecExpr=refName genTypeList? (pureFuncInvokeArgs | '&' funcRefArgs?)? )?
+	nullsafe=QUESTION? (CARET (doubledot=CARET)? ) (constru=constructorInvoke | arrayRefElements+ | afterVecExpr=refName genTypeList? (pureFuncInvokeArgs | AND funcRefArgs?)? )?
 	;
 
-dotOperatorExpr: ((pntUnrefCnt+='*'|pntUnrefCnt2+='**' )+ | address='~')? copyExpr ( NEWLINE* dotOpArg NEWLINE* copyExpr)*;
+dotOperatorExpr: ((pntUnrefCnt+=MULTIPLY|pntUnrefCnt2+=DUEL_MULTIPLY )+ | address=TILDE)? copyExpr ( NEWLINE* dotOpArg NEWLINE* copyExpr)*;
 
-copyExpr : expr_stmt_BelowDot (isCopy='@' (hasCopier=LPARA {setNotInArrayDef();} ( (copyExprItem  (',' copyExprItem)* ','?)? (';' modifier+=NAME (',' modifier+=NAME)* ','?  )? ) RPARA {popInArrayDef();} )? )?;
+copyExpr : expr_stmt_BelowDot (isCopy=AMP (hasCopier=LPARA {setNotInArrayDef();} ( (copyExprItem  (COMMA copyExprItem)* COMMA?)? (SEMI_COLON modifier+=NAME (COMMA modifier+=NAME)* COMMA?  )? ) RPARA {popInArrayDef();} )? )?;
 
-copyExprItem: ename=NAME '=' expr_stmt
+copyExprItem: ename=NAME EQUALS expr_stmt
 	|  incName=NAME
-	| '<' exclName+=NAME (',' exclName+=NAME)* ','? '>'
-	| (copyName=NAME | superCopy=SUPER_N )'@' ( hasCopier=LPARA {setNotInArrayDef();} ( (copyExprItem  (',' copyExprItem)* ','?)?  (';' modifier+=NAME (',' modifier+=NAME)* ','? )? ) RPARA {popInArrayDef();} )?
+	| LESS_THAN exclName+=NAME (COMMA exclName+=NAME)* COMMA? MORE_THAN
+	| (copyName=NAME | superCopy=SUPER_N )AMP ( hasCopier=LPARA {setNotInArrayDef();} ( (copyExprItem  (COMMA copyExprItem)* COMMA?)?  (SEMI_COLON modifier+=NAME (COMMA modifier+=NAME)* COMMA? )? ) RPARA {popInArrayDef();} )?
 	;
 
 
@@ -866,16 +898,16 @@ expr_stmt_BelowDot //seperate rule for match operations - basically atoms
 	| NAME genTypeList #RefQualifiedGeneric //{ $ret = new RefQualifiedGenericNamedType(getLine(input), getColumn(input), $namedT.text, $gg.genTypes);   }//ret namedType
     | LPARA {setNotInArrayDef();} ACTOR_N dotted_name genTypeList? RPARA {popInArrayDef();} #RefQualifiedGenericActor //{ $ret = gg==null? new RefQualifiedGenericNamedType(getLine(input), getColumn(input), $namedTa.ret, true) : new RefQualifiedGenericNamedType(getLine(input), getColumn(input), $namedTa.ret, $gg.genTypes, true);   }//ret namedType
 
-	| expr_stmt_BelowDot genTypeList? '&' funcRefArgs? #FuncRefExpr
-	| expr_stmt_BelowDot (refCnt+=':')* arrayRefElements+ (extraEmptyBracks+=LBRACK RBRACK)* #ArrayRefExpr
-	| main=expr_stmt_BelowDot (refCnt+=':')+ post=expr_stmt_BelowDot? #RefExpr
+	| expr_stmt_BelowDot genTypeList? AND funcRefArgs? #FuncRefExpr
+	| expr_stmt_BelowDot (refCnt+=COLON)* arrayRefElements+ (extraEmptyBracks+=LBRACK RBRACK)* #ArrayRefExpr
+	| main=expr_stmt_BelowDot (refCnt+=COLON)+ post=expr_stmt_BelowDot? #RefExpr
 	| notNullAssertion2 #AtomPassThrough
 	;
 
 
-arrayRefElements:  (nullSafe='?'? LBRACK arrayRefElement (',' arrayRefElement)* (trailcomma+=',')* RBRACK )  ;
+arrayRefElements:  (nullSafe=QUESTION? LBRACK arrayRefElement (COMMA arrayRefElement)* (trailcomma+=COMMA)* RBRACK )  ;
 
-notNullAssertion2 :  atom (NEWLINE* nna='??')?;
+notNullAssertion2 :  atom (NEWLINE* nna=DUEL_QUESTION)?;
 
 atom
 	: classNode
@@ -908,7 +940,7 @@ atom
 
 nestedNode: {setNotInArrayDef();} LPARA expr_stmt_tuple RPARA {popInArrayDef();};
 
-classNode: type '.' CLASS_N;
+classNode: type DOT CLASS_N;
 superNode : SUPER_N (LBRACK superQuali=dotted_name RBRACK)? ( dotOpArg expr_stmt_BelowDot )+;
 changedNode: CHANGED_N;
 outNode: OUT_N;
@@ -926,9 +958,9 @@ regexStringNode : REGEX_STRING_ITM;
 ofNode : OF_N;
 
 arrayRefElement
-	: (lhs=expr_stmt DDD rhs=expr_stmt)
-	| (post=expr_stmt DDD )
-	| ( DDD pre=expr_stmt)
+	: (lhs=expr_stmt TRIPLE_DOT rhs=expr_stmt)
+	| (post=expr_stmt TRIPLE_DOT )
+	| ( TRIPLE_DOT pre=expr_stmt)
 	| ( simple=expr_stmt )
 	;
 
@@ -938,29 +970,29 @@ refName
 
 
 dotOpArg
-	: '.'|'\\.'|'..'|'?.'
+	: DOT PIPE ESCAPE_DOT PIPE DUEL_DOT PIPE QUESTION_DOT
 	;
 
 arrayDef
 	: LBRACK RBRACK
-	| (isArray=ALBRACK | LBRACK) NEWLINE* ((expr_stmt  ( ( NEWLINE* ',' NEWLINE* expr_stmt )+  ','? | NEWLINE*',')  ) | ',') NEWLINE* RBRACK //list def or single element array
+	| (isArray=ALBRACK | LBRACK) NEWLINE* ((expr_stmt  ( ( NEWLINE* COMMA NEWLINE* expr_stmt )+  COMMA? | NEWLINE*COMMA)  ) | COMMA) NEWLINE* RBRACK //list def or single element array
 	| arrayDefComplex
 	;
 
-arrayDefComplex: ALBRACK expr_stmt_+ arrayDefComplexNPLus1Row* (NEWLINE* ';' NEWLINE*)? RBRACK
-	|  {setInArrayDef();} LBRACK expr_stmt_+ arrayDefComplexNPLus1Row* (NEWLINE* ';' NEWLINE*)? RBRACK {popInArrayDef();}
+arrayDefComplex: ALBRACK expr_stmt_+ arrayDefComplexNPLus1Row* (NEWLINE* SEMI_COLON NEWLINE*)? RBRACK
+	|  {setInArrayDef();} LBRACK expr_stmt_+ arrayDefComplexNPLus1Row* (NEWLINE* SEMI_COLON NEWLINE*)? RBRACK {popInArrayDef();}
 	;
 
 
 arrayDefComplexNPLus1Row
-	: (';' NEWLINE* | NEWLINE+) expr_stmt_+
+	: (SEMI_COLON NEWLINE* | NEWLINE+) expr_stmt_+
 	;
 
 mapDef
-	: LBRACE NEWLINE*  mapDefElement  (NEWLINE* ',' NEWLINE* mapDefElement )* (NEWLINE* ',')?  NEWLINE* RBRACE
+	: LBRACE NEWLINE*  mapDefElement  (NEWLINE* COMMA NEWLINE* mapDefElement )* (NEWLINE* COMMA)?  NEWLINE* RBRACE
 	;
 
-mapDefElement: (isDefault=DEFAULT_N | key=expr_stmt) NEWLINE*  '->' NEWLINE*  value=expr_stmt;
+mapDefElement: (isDefault=DEFAULT_N | key=expr_stmt) NEWLINE*  FORWARD_ARROW NEWLINE*  value=expr_stmt;
 
 
 ///////////// expresssions:constructors/////////////
@@ -973,16 +1005,16 @@ constructorInvoke
 	;
 
 namedConstructor
-	: type  ( ( isConsRef='&' funcRefArgs) | isConsRef='&' | pureFuncInvokeArgs)
+	: type  ( ( isConsRef=AND funcRefArgs) | isConsRef=AND | pureFuncInvokeArgs)
 	;
 
 namedActorConstructor
-  : isNewDefiend=NEW_N? ACTOR_N namedType_ExActor ( (isConsRef='&' funcRefArgs) | isConsRef='&' | pureFuncInvokeArgs)
+  : isNewDefiend=NEW_N? ACTOR_N namedType_ExActor ( (isConsRef=AND funcRefArgs) | isConsRef=AND | pureFuncInvokeArgs)
   ;
 
 arrayConstructor
   :
-   primNamedOrFuncType ('|' primNamedOrFuncType)*
+   primNamedOrFuncType (PIPE primNamedOrFuncType)*
    		 (LBRACK  arconExprsSubsection RBRACK)+ (nullEnd+=LBRACK RBRACK)*
    		 (LPARA {setNotInArrayDef();} expr_stmt_tuple RPARA {popInArrayDef();} )?
    		 //constructor args...
@@ -997,7 +1029,7 @@ arrayConstructorPrimNoNew:
 	;
 
 arconExprsSubsection:
-	expr_stmt (',' expr_stmt  )* (commaEnd+=',')*
+	expr_stmt (COMMA expr_stmt  )* (commaEnd+=COMMA)*
 	;
 
 
@@ -1013,11 +1045,11 @@ typeEclRef
 ///////////// expresssions:operators /////////////
 
 equalityOperator
-  : '==' | '&==' | '<>' | '&<>'
+  : DUEL_EQUALS | AND_DUEL_EQUALS | LESS_THAN_MORE_THAN | AND_LESS_THAN_MORE_THAN
   ;
 
 relationalOperator
-  : '<' | '>' | '>==' | '<=='
+  : LESS_THAN | MORE_THAN | MORE_THAN_DUEL_EQUALS | LESS_THAN_DUEL_EQUALS
   ;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//TOKEN Names//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -1033,19 +1065,12 @@ PACKAGE:'package';
 
 /////////////////////////////////////////////////////////lexer/////////////////////////////////////////////////////////
 
-DOT: '.';
-
-DOTDOT: '..';
-
-DDD: '...';
-
-
 LONGINT
-    :   INT ('l'|'L')
+    :   INT ('lPIPEL')
     ;
 
 SHORTINT
-    :   INT ('s'|'S')
+    :   INT ('sPIPES')
     ;
 
 fragment HexDigits
@@ -1075,24 +1100,24 @@ INT :  HexIntegerLiteral
 
 
 fragment DBL_FRAG
-  :  '.' DIGITS (Exponent)?
-    |   DIGITS ( '.' (DIGITS (Exponent)?)? | Exponent)
+  :  DOT DIGITS (Exponent)?
+    |   DIGITS ( DOT (DIGITS (Exponent)?)? | Exponent)
     ;
 
 fragment
 Exponent
-	:	('e' | 'E') ( '+' | '-' )? DIGITS
+	:	(EXPONENT_S) ( PLUS | MINUS )? DIGITS
 	;
 
 
-FLOAT :  (DBL_FRAG | INT) ('f' |'F');
+FLOAT :  (DBL_FRAG | INT) FLOAT_S;
 
-DOUBLE:  DBL_FRAG ('d'|'D')? | INT ('d'|'D');
+DOUBLE:  DBL_FRAG DOUBLE_S? | INT DOUBLE_S;
 
 fragment EscapeSequence
-    : '\\' [btnfr{"'\\]
-    | '\\' ([0-3]? [0-7])? [0-7]
-    | '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
+    : ESCAPE [btnfr{"'\\]
+    | ESCAPE ([0-3]? [0-7])? [0-7]
+    | ESCAPE 'u'+ HexDigit HexDigit HexDigit HexDigit
     ;
 
 STRING_ITMcit
@@ -1107,7 +1132,7 @@ fragment EscapeSequenceLE
 	;
 
 LANG_EXT
-  :  '||' (   ~( '\\' | '|'  ) | EscapeSequenceLE )* '||'
+  :  '||' (   ~( '\\' | '|' /* Tokens aren't supported in sets, apparently */  ) | EscapeSequenceLE )* '||'
   ;
 
 
@@ -1123,7 +1148,7 @@ MULTILINE_COMMENT
     ;
 
 LINE_COMMENT
-    : '//' ~('\n'|'\r')*  -> channel(HIDDEN)
+    : '//' ~('\n' | '\r')*  -> channel(HIDDEN)
     ;
 
 IGNORE_NEWLINE  :  '\r'? '\n' {skipNewLine}? -> channel(HIDDEN) ;
@@ -1145,7 +1170,7 @@ WS2 :
 	'\\' (' ' | '\t' | '\f' | LINE_COMMENT|MULTILINE_COMMENT )* ('\r'? '\n')+ -> channel(HIDDEN)
 	;//ignore newline if prefixed with \ just like in python
 
-//
+// Keywords
 
 // A
 ABSTRACT_N: 'abstract';
@@ -1260,6 +1285,90 @@ VOID_N: 'void';
 // W
 WHILE_N: 'while';
 WITH_N: 'with';
+
+// Symbol Combinations
+
+FORWARD_ARROW: MORE_THAN MINUS;
+BACK_ARROW: LESS_THAN MINUS;
+FAT_ARROW: EQUALS MORE_THAN;
+
+LESS_THAN_DUEL_EQUALS: LESS_THAN DUEL_EQUALS;
+MORE_THAN_DUEL_EQUALS: MORE_THAN DUEL_EQUALS;
+
+ESCAPE_EQUALS: ESCAPE EQUALS;
+ESCAPE_DOT: ESCAPE DOT;
+
+DUEL_QUESTION: QUESTION QUESTION;
+
+DUEL_PLUS: PLUS PLUS;
+DUEL_MINUS: MINUS MINUS;
+DUEL_MULTIPLY: MULTIPLY MULTIPLY;
+
+DUEL_EQUALS: EQUALS EQUALS;
+
+AND_DUEL_EQUALS: AND DUEL_EQUALS;
+AND_LESS_THAN_MORE_THAN: AND LESS_THAN_MORE_THAN;
+
+DUEL_LESS_THAN: LESS_THAN LESS_THAN;
+DUEL_MORE_THAN: MORE_THAN MORE_THAN;
+
+TRIPLE_MORE_THAN: MORE_THAN MORE_THAN MORE_THAN;
+
+TRIPLE_DOT: DOT DOT DOT;
+DUEL_DOT: DOT DOT;
+
+PLUS_EQUALS: PLUS EQUALS;
+MINUS_EQUALS: MINUS EQUALS;
+MULTIPLY_EQUALS: MULTIPLY EQUALS;
+DIVIDE_EQUALS: DIVIDE EQUALS;
+
+LESS_THAN_EQUALS: LESS_THAN EQUALS;
+LESS_THAN_MORE_THAN: LESS_THAN MORE_THAN;
+
+MOD_N_EQUALS: MOD_N EQUALS;
+DUEL_MULTIPLY_EQUALS: DUEL_MULTIPLY EQUALS;
+OR_N_EQUALS: OR_N EQUALS;
+AND_N_EQUALS: AND_N EQUALS;
+BAND_N_EQUALS: BAND_N EQUALS;
+BOR_N_EQUALS: BOR_N EQUALS;
+BXOR_N_EQUALS: BXOR_N EQUALS;
+
+DUEL_LESS_THAN_EQUALS: DUEL_LESS_THAN EQUALS;
+DUEL_MORE_THAN_EQUALS: DUEL_MORE_THAN EQUALS;
+TRIPLE_MORE_THAN_EQUALS: TRIPLE_MORE_THAN EQUALS;
+
+QUESTION_COLON: QUESTION COLON;
+QUESTION_DOT: QUESTION DOT;
+
+// Symbols
+
+DOT: '.';
+COMMA: ',';
+SEMI_COLON: ';';
+COLON: ':';
+EXCLAMATION: '!';
+QUESTION: '?';
+ESCAPE: '\\';
+CARET: '^';
+
+AND: '&';
+AMP: '@';
+
+TILDE: '~';
+PIPE: '|';
+
+MINUS: '-';
+PLUS: '+';
+MULTIPLY: '*';
+DIVIDE: '/';
+
+EQUALS: '=';
+LESS_THAN: '<';
+MORE_THAN: '>';
+
+EXPONENT_S: 'e' | 'E';
+DOUBLE_S: 'd' | 'D';
+FLOAT_S: 'f' | 'F';
 
 //
 
@@ -1386,9 +1495,11 @@ KEYWORD: VAL
        | WITH_N
        ;
 
+//
+
 NAME: //{permitDollarPrefixRefName}? => '$'+ NAME_ITMS |
 	 NAME_ITMS//a nice list of keywords...!!! <- do this before release!
-	 | '\\' KEYWORD
+	 | ESCAPE KEYWORD
 	;
 
 fragment

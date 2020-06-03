@@ -1154,20 +1154,19 @@ LINE_COMMENT
 IGNORE_NEWLINE  :  '\r'? '\n' {skipNewLine}? -> channel(HIDDEN) ;
 NEWLINE  :  '\r'? '\n';
 
-LPARA: '(' { prevskip.add(skipNewLine); skipNewLine=true; } ;
-RPARA: ')' { skipNewLine=prevskip.isEmpty()?false:prevskip.pop(); };
-LBRACK: '['{ prevskip.add(skipNewLine); skipNewLine=false; } ;
-ALBRACK: 'a['{ prevskip.add(skipNewLine); skipNewLine=false; } ;
-RBRACK: ']'{ skipNewLine=prevskip.isEmpty()?false:prevskip.pop(); };
+LPARA: LEFT_PARENTHESES { prevskip.add(skipNewLine); skipNewLine=true; } ;
+RPARA: RIGHT_PARENTHESES { skipNewLine=prevskip.isEmpty()?false:prevskip.pop(); };
+LBRACK: LEFT_BRACKET { prevskip.add(skipNewLine); skipNewLine=false; } ;
+ALBRACK: LEFT_BRACKET_ALT { prevskip.add(skipNewLine); skipNewLine=false; } ;
+RBRACK: RIGHT_BRACKET { skipNewLine=prevskip.isEmpty()?false:prevskip.pop(); };
 
-LBRACE:'{'{ prevskip.add(skipNewLine); skipNewLine=false; } ;
-RBRACE:'}'{ skipNewLine=prevskip.isEmpty()?false:prevskip.pop(); };
-
+LBRACE: LEFT_BRACE { prevskip.add(skipNewLine); skipNewLine=false; } ;
+RBRACE: RIGHT_BRACE { skipNewLine=prevskip.isEmpty()?false:prevskip.pop(); };
 
 WS  :  (' ' | '\t' | '\f' )+ -> channel(HIDDEN)	;
 
 WS2 :
-	'\\' (' ' | '\t' | '\f' | LINE_COMMENT|MULTILINE_COMMENT )* ('\r'? '\n')+ -> channel(HIDDEN)
+	ESCAPE (' ' | '\t' | '\f' | LINE_COMMENT|MULTILINE_COMMENT )* ('\r'? '\n')+ -> channel(HIDDEN)
 	;//ignore newline if prefixed with \ just like in python
 
 // Keywords
@@ -1350,6 +1349,16 @@ EXCLAMATION: '!';
 QUESTION: '?';
 ESCAPE: '\\';
 CARET: '^';
+
+LEFT_PARENTHESES: '(';
+RIGHT_PARENTHESES: ')';
+
+LEFT_BRACKET_ALT: 'a' LEFT_BRACKET;
+LEFT_BRACKET: '[';
+RIGHT_BRACKET: ']';
+
+LEFT_BRACE: '{';
+RIGHT_BRACE: '}';
 
 AND: '&';
 AMP: '@';
